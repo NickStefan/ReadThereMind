@@ -1,10 +1,8 @@
 var receiveData = function(data){
 	$('.results').html('');
 	for (var i = 0; i < data.length; i++){
-		console.log(data[i].geo);
-		console.log(data[i].user.location);
-		console.log(data[i].created_at);
-		var tweet = $('<div>').text(data[i].text);
+		console.dir(data[i]);
+		var tweet = $('<div>').html(data[i].text + '<br>' + data[i].sentiment);
 		$('.results').append(tweet);
 	}
 }
