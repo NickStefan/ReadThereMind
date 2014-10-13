@@ -8,7 +8,10 @@ router.get('/', function(req, res) {
 });
 
 router.post('/', function(req, res) {
-  twitterMachine(req.body.search, function (data) {
+	var options = {
+		count: 100
+	}
+  twitterMachine(req.body.search, options, function (data) {
     res.json(data);
   });
 });

@@ -1,7 +1,12 @@
 var receiveData = function(data){
-	console.log(data);
 	$('.results').html('');
-	$('.results').html(JSON.stringify(data));
+	for (var i = 0; i < data.length; i++){
+		console.log(data[i].geo);
+		console.log(data[i].user.location);
+		console.log(data[i].created_at);
+		var tweet = $('<div>').text(data[i].text);
+		$('.results').append(tweet);
+	}
 }
 
 $('#findSentiment').submit(function(e){
