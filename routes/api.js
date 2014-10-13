@@ -1,5 +1,6 @@
 var express = require('express');
 var router = express.Router();
+var twitterMachine = require('../twitterHandler');
 
 /* GET home page. */
 router.get('/', function(req, res) {
@@ -7,8 +8,9 @@ router.get('/', function(req, res) {
 });
 
 router.post('/', function(req, res) {
-	var results = req.body.search;
-  res.json({results: results});
+  twitterMachine(req.body.search, function (data) {
+    res.json(data);
+  });
 });
 
 module.exports = router;
