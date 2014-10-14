@@ -13,7 +13,7 @@ function dbAsync(sql, strLocation) {
 var geocoder = function(givenGeo,strLocation,cb){
 
 	if (givenGeo !== null) {
-    return cb(null, givenGeo);
+    return cb(null, givenGeo.coordinates);
 	} else {
 		// regex out any 'the' ', CA' etc
 		strLocation = strLocation.replace(/the(\s+)?/i,"");

@@ -1,9 +1,9 @@
 var receiveData = function(data){
 	$('.results').html('');
 	for (var i = 0; i < data.length; i++){
-		console.dir(data[i]);
 		var tweet = $('<div>').html(data[i].text + '<br>' + data[i].sentiment);
 		$('.results').append(tweet);
+		updateMap(data);
 	}
 }
 
@@ -29,7 +29,10 @@ var map = new Datamap({
   element: document.getElementById('container'),
 	scope: 'usa',
 	fills: {
-	        defaultFill: 'rgba(255,255,255,1)' //any hex, color name or rgb/rgba value
+	        defaultFill: 'rgba(255,255,255,1)', //any hex, color name or rgb/rgba value
+	    		green: 'green',
+	    		red: 'red',
+	    		blue: 'blue',
 	    },
 	geographyConfig: {
 	  borderColor: 'black',
@@ -37,32 +40,22 @@ var map = new Datamap({
 	}
 });
 
-// var tweets;
-// d3.csv('cyclones10-14.csv', function(csv){
-//   tweets = d3.nest()
-//     .key(function(d){ return moment(d.ISO_time).format('YYYY , DDD')})
-//     .sortKeys(d3.ascending)
-//     .entries(csv);
-//   var index = 0
-//   setInterval(function(){
-//     for(var i = 0; i< tweets[index].values.length; i++){
-//       // console.log(tweets[index].values[i])
-//       tweets[index].values[i].longitude = parseFloat(tweets[index].values[i].Longitude);
-//       tweets[index].values[i].latitude = parseFloat(tweets[index].values[i].Latitude);
-//       tweets[index].values[i].radius = 4
-//     }
-//     console.log(tweets[index].values)
-//     //console.log(tweets[index].values);
-//     map.bubbles(tweets[index].values, {
-//       popupTemplate: function (geo, data) {
-//         console.log(data)
-//               return ['<div class="hoverinfo">' +  data.name,
-//               '<br/>Date: ' +  data.date + '',
-//               '</div>'].join('');
-//       }
-//     });
-//     index++
-//   }, 100);
+var getDate = function(d) {
+  return new Date(d.Date);
+};
 
-// });
+function updateMap(data) {
+  var minTime = getDate(data[0].created_at);
+  var maxTime = getDate(data[data.length-1].created_at);
+  var ticks = d3.time.scale().domain([minTime, maxTime]).range([0, 60]);
+
+  map.bubbles(data,{
+    popupTemplate: function (geo, data) {
+      return ['<div class="hoverinfo">' + data.screen_name + '<br/>' + data.text,
+      '<br/>Date: ' +  data.created_at + '',
+      '</div>'].join('');
+    }
+  });
+}
+
 
