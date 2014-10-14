@@ -1,6 +1,7 @@
 var twitter = require('twitter');
 var config = require('./twitterKeys');
 var sentiment = require('./sentimentHandler');
+//var geocoder = require('./geocoder');
  
 var getTweets = function(text, options, callback) {
   var twitterClient = new twitter(config);
@@ -11,6 +12,14 @@ var getTweets = function(text, options, callback) {
       var resp = {};
       resp = data.statuses[i];
       resp.sentiment = sentiment(data.statuses[i].text).score;
+      if (!resp.geo) {
+        var lng = 40;
+        var lat = -120;
+        resp.geo = {};
+        resp.type = 'Point';
+        resp.geo.coordinates = [];
+        resp.geo.coordinates.push(lng,lat);
+      }
       // resp.text = data.statuses[i].text;
       // resp.geo = data.statuses[i].geo;
       // resp.location = data.statuses[i].user.location;

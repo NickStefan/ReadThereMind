@@ -2,9 +2,11 @@
 
 {% block content %}
   <h1> {{title}} </h1>
+  
   <form id="findSentiment">
     <input type='text' id="search"/>
   </form>
+  <div id="container" style="position: relative; width: 1000px; height: 600px;"></div>
   <p class="results"> {{results}} </p>
   
 {% endblock %}
