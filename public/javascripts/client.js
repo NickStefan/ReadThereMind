@@ -12,6 +12,7 @@ $('#findSentiment').submit(function(e){
   var search = $('#search').val();
   sendData(search);
   $('#search').val('');
+  $('#searchTerm').text(search);
 });
 
 var sendData = function(data){

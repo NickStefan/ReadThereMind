@@ -1,35 +1,58 @@
 var twitter = require('twitter');
 var config = require('./twitterKeys');
 var sentiment = require('./sentimentHandler');
+var Promise = require('bluebird');
 var geocoder = require('./geocoder');
  
-var getTweets = function(text, options, callback) {
-  var twitterClient = new twitter(config);
-  var response = [];
-  console.log(geocoder(text));
-  twitterClient.search(text, options, function(data) {
-    for (var i = 0; i < data.statuses.length; i++) {
-      var resp = {};
-      resp = data.statuses[i];
-      resp.sentiment = sentiment(data.statuses[i].text).score;
-      if (!resp.geo) {
-        // console.log(goecoder(data.statuses[i].text));
-        // var lat = 40;
-        // var lng = -120;
-        // resp.geo = {};
-        // resp.type = 'Point';
-        // resp.geo.coordinates = [];
-        // resp.geo.coordinates.push(lat,lng);
-      }
-      // resp.text = data.statuses[i].text;
-      // resp.geo = data.statuses[i].geo;
-      // resp.location = data.statuses[i].user.location;
-      // resp.created_at = data.statuses[i].created_at;
-      // resp.user = data.statuses[i].user;
-      response.push(resp);
-    };
-    callback(response);
+var twitterClient = new twitter(config);
+
+function twitterSearchAsync(search,options) {
+  return new Promise(function(resolve,reject){
+    twitterClient.search(search,options,function(data){
+      resolve(data.statuses);
+    });
   });
 }
+
+function geoAsync(givenGeo,strLocation){
+  return new Promise(function(resolve,reject){
+    geocoder(givenGeo,strLocation,function(err,data){
+      resolve(err,data);
+    });
+  });
+}
+
+var getTweets = function(text, options, callback) {
+  
+  twitterSearchAsync(text, options).map(function(tweet) {
+    var resp = {};
+    resp = tweet;
+    resp.sentiment = sentiment(tweet.text).score;
+    return geoAsync(tweet.geo, tweet.user.location).then(function(err,data){
+      //console.log("Data", err, data);
+      if (err){
+        console.log("Err", err);
+      } else if (data && data.length) {
+        console.log("db")
+        var geo = {};
+        geo.coordinates = [];
+        geo.coordinates.push(data[0][6]);
+        geo.coordinates.push(data[0][7]);
+        resp.geo = geo;
+      } else {
+        console.log('null');
+        resp.geo = null;
+      }
+      return resp;
+    });
+  })
+  // .call("filter",function(v,k,c){
+  //   // only return tweets with geo data
+  //   return !!v.geo;
+  // })
+  .then(function(response){
+      callback(response);
+  });
+};
 
 module.exports = getTweets;
