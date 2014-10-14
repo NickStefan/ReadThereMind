@@ -5,16 +5,15 @@ var Promise = require('bluebird');
 function dbAsync(sql, strLocation) {
 	return new Promise(function(resolve,reject){
     db.query(sql,[strLocation],function(err,data){
-    	//console.log("db", err, data);
-    	resolve(err,data);
+    	resolve(data);
     });
 	});
 }
 
 var geocoder = function(givenGeo,strLocation,cb){
-	//console.log(strLocation);
+
 	if (givenGeo !== null) {
-    cb(null, givenGeo);
+    return cb(null, givenGeo);
 	} else {
 		// regex out any 'the' ', CA' etc
 		strLocation = strLocation.replace(/the(\s+)?/i,"");
@@ -23,13 +22,19 @@ var geocoder = function(givenGeo,strLocation,cb){
 		strLocation += '*';
 		sql = "SELECT * FROM geoname_fulltext WHERE longname MATCH ? AND country = 'United States' ORDER BY population DESC LIMIT 1";
 	  
-	  dbAsync(sql, strLocation).then(function(err,data){
-	  	console.log(err, data);
-	  	cb(err,data);
+	  return dbAsync(sql, strLocation).then(function(data){
+	  	return cb(null,data);
 	  });
-    // db.query(sql,[strLocation],cb);
 	}
 }
 
+function geoAsync(givenGeo,strLocation){
+  return new Promise(function(resolve,reject){
+    geocoder(givenGeo,strLocation,function(err,data){
+      resolve(data);
+    });
+  });
+}
 
-module.exports = geocoder;
+
+module.exports = geoAsync;
