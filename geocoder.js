@@ -5,26 +5,27 @@ var Promise = require('bluebird');
 function dbAsync(sql, strLocation) {
 	return new Promise(function(resolve,reject){
     db.query(sql,[strLocation],function(err,data){
+    	if (err) {console.log(err)};
     	resolve(data);
     });
 	});
 }
 
 var geocoder = function(givenGeo,strLocation,cb){
-
 	if (givenGeo !== null) {
     return cb(null, givenGeo.coordinates);
 	} else {
 		// regex out any 'the' ', CA' etc
-		strLocation = strLocation.replace(/the(\s+)?/i,"");
-		strLocation = strLocation.replace(/,(\s+)?(\w+)$/i,"");
-		strLocation = strLocation.replace(/[^\w|\s]/,"");
-		strLocation += '*';
-		sql = "SELECT * FROM geoname_fulltext WHERE longname MATCH ? AND country = 'United States' ORDER BY population DESC LIMIT 1";
-	  
-	  return dbAsync(sql, strLocation).then(function(data){
-	  	return cb(null,data);
-	  });
+		var finalStrLocation = strLocation.replace(/[\W_]+/gi,"") + '*';
+		if (!finalStrLocation) {
+			// nothing to search the database with
+			return cb(null,null);
+		} else {
+			sql = "SELECT * FROM geoname_fulltext WHERE longname MATCH ? AND country = 'United States' ORDER BY population DESC LIMIT 1";
+		  return dbAsync(sql, finalStrLocation).then(function(data){
+		  	return cb(null,data);
+		  });
+		}
 	}
 }
 

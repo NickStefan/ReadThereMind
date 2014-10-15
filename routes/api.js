@@ -10,7 +10,7 @@ router.get('/', function(req, res) {
 router.post('/', function(req, res) {
 	var options = {
 		count: 100
-	}
+	};
   twitterMachine(req.body.search, options, function (data) {
     res.json(data);
   });

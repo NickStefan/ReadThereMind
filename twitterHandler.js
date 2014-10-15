@@ -14,7 +14,7 @@ var twitterClient = new twitter(config);
 function twitterSearchAsync(search,options) {
   return new Promise(function(resolve,reject){
     twitterClient.search(search,options,function(data){
-      console.log("success reached twitter");
+      console.log("success reached twitter", data.statuses.length);
       resolve(data.statuses);
     });
   });
@@ -56,7 +56,7 @@ var getTweets = function(text, options, callback) {
     return v.geo;
   })
   .then(function(response){
-      console.log("success sentiment, geo");
+      console.log("success sentiment, geo", response.length);
       callback(response);
   });
 };
