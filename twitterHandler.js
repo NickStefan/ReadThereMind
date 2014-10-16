@@ -14,7 +14,7 @@ var twitterClient = new twitter(config);
 function twitterSearchAsync(search,options) {
   return new Promise(function(resolve,reject){
     twitterClient.search(search,options,function(data){
-      console.log("success reached twitter", data.statuses.length);
+      console.log("success twitter", data.statuses.length);
       resolve(data.statuses);
     });
   });
@@ -28,16 +28,17 @@ var getTweets = function(text, options, callback) {
       if (data === null || data[0] === undefined){
         resp.geo = false;
       } else if (data[0].length > 2) {
-        resp.geo = true
+        resp.geo = true;
         resp.latitude = data[0][6];
         resp.longitude = data[0][7];
       } else {
-        resp.geo = true
+        resp.geo = true;
         resp.latitude = data[0];
         resp.longitude = data[1];
       }
       resp.screen_name = tweet.user.screen_name;
       resp.text = tweet.text;
+      resp.id = tweet.id;
       resp.created_at = tweet.created_at;
       resp.sentiment = sentiment(tweet.text).score;
       resp.radius = (Math.abs(resp.sentiment) + 5) * 2;
@@ -51,14 +52,18 @@ var getTweets = function(text, options, callback) {
       return resp;
     });
   })
-  .call("filter",function(v,k,c){
-    // only return tweets with geo data
-    return v.geo;
-  })
   .then(function(response){
-      console.log("success sentiment, geo", response.length);
+      console.log("success sentiment", response.length);
       callback(response);
   });
 };
 
-module.exports = getTweets;
+function getTweetsAsync(text,options){
+  return new Promise(function(resolve,reject){
+    getTweets(text,options,function(data){
+      resolve(data);
+    });
+  });
+}
+
+module.exports = getTweetsAsync;

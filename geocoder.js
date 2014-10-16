@@ -37,5 +37,4 @@ function geoAsync(givenGeo,strLocation){
   });
 }
 
-
 module.exports = geoAsync;
