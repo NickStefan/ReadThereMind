@@ -6,34 +6,21 @@ router.get('/', function(req, res) {
   res.render('index', { title: 'API' });
 });
 
-// router.post('/', function(req, res) {
-// 	var options = {
-// 		count: 100
-// 	};
-//   twitterMachine(req.body.search, options, function (data) {
-//     res.json(data);
-//   });
-// });
-
 // while twitter gives a response, keep fetching with max_id
 // should only need to do this once, as history wont get older
-// then, all the following times, only fetch new ones using since_id
+// then, all the following times, only fetch new ones using since_id:
 
 // if (searched term in database)
-//   fetch twitter api with since_id until no new responses
+//   use getMaxHistory() plus "since_id" (most recent local DB tweet)
 //   twitterMachine + options{since_id: dbresults_most_recent_id}
 // else // ie not in the db yet
-//   fetch twitter api with max_id until no new responses
-//   twitterMachine + options{max_id: dbresults_oldest_id}
-//
-// fetch all tweets from db and res.json(data)
+//   use getMaxHistory()
 
 // need to look into mongodb on heroku???
 
 router.post('/', function(req, res) {
   console.log("posted")
   var response = [];
-  var temp;
   var count = 0;
   
   var getMaxHistory = function (data) {
@@ -47,14 +34,17 @@ router.post('/', function(req, res) {
 
       response = response.concat(data);
     }
-
-    console.log('datad', max_id, oldest, newest);
     count++;
 
+    console.log("requests ", count, max_id, oldest, newest);
+    
+
     if (data.length < 2 || count === 15) {
-      // filter and hit database
-      console.log("no more", response.length);
-      res.json(response.filter(function(v,k,c){ return v.geo;}));
+      // filter for geo data'd tweets and TODO hit database
+      console.log(response.length," tweets");
+      response = response.filter(function(v,k,c){ return v.geo;});
+      console.log(response.length, " geo tweets");
+      res.json(response);
     } else {
       twitterMachine(req.body.search, options).then( getMaxHistory );
     }
