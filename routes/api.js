@@ -1,59 +1,26 @@
 var express = require('express');
 var router = express.Router();
-var twitterMachine = require('../twitterHandler');
-var Promise = require('bluebird');
-
-var mongo = require('mongoskin');
-var db = mongo.db('mongodb://localhost:27017/tweets',{native_parser:true});
-
-var fetchTweets = function(search){
-  return new Promise(function(resolve,reject){
-    db.collection(search).find().toArray(function(err,data){
-      if (err) console.log(err);
-      resolve(data);
-    });
-  });
-};
-
-var insertTweets = function(search, tweets){
-  return new Promise(function(resolve,reject){
-    db.collection(search).insert(tweets, function(err, result){
-      if (err) console.log(err);
-      resolve(result);
-    });
-  });
-};
-
-router.get('/', function(req, res) {
-  res.render('index', { title: 'API' });
-});
-
-// while twitter gives a response, keep fetching with max_id
-// should only need to do this once, as history wont get older
-// then, all the following times, only fetch new ones using since_id:
-
-// if (searched term in database)
-//   use getMaxHistory() plus "since_id" (most recent local DB tweet)
-//   twitterMachine + options{since_id: dbresults_most_recent_id}
-// else // ie not in the db yet
-//   use getMaxHistory()
-
-// need to look into mongodb on heroku???
+var twitterMachine = require('../twitterHandler/twitterHandler');
+var db = require('../db');
 
 router.post('/', function(req, res) {
   var response = [];
   var dbAlready;
   var count = 0;
 
-  fetchTweets(req.body.search).then(function(results){
+  db.fetchTweets(req.body.search).then(function(results){
     var options = {};
+    // if searched term in database as a collection:
+    // fetch twitter with "since_id" (most recent local DB tweet)
+    // only fetch tweets newer than this
     if (results.length > 0) {
       dbAlready = results;
-      console.log('results', results.length);
+      console.log('results', results.length, '\n');
       since_id = results[ results.length - 1 ].id;
-      console.log(since_id);
       options.count = 100;
       options.since_id = since_id;
+    
+    // term not in database as collection:
     } else {
       options.count = 100;
     }
@@ -63,8 +30,14 @@ router.post('/', function(req, res) {
 
   function getMaxHistory (data) {
     var max_id, options, oldest, newest;
+
+    // twitter has sent back tweets:
     if (data.length > 0) {
-      // get oldest tweet
+      // get oldest tweet of what twitter sent us and only retrieve
+      // tweets older than this until either: 
+      //   no more tweets sent back,
+      //   1500 tweets total sent to us,
+      //   since_id reached (only if term already in DB collections)
       max_id = data[data.length - 1].id - 1;
       options = {};
       options.count = 100;
@@ -72,31 +45,30 @@ router.post('/', function(req, res) {
       if (dbAlready) {
         options.since_id = dbAlready[ dbAlready.length - 1 ].id;
       }
-      console.log(since_id);
       newest = data[0].created_at;
       oldest = data[data.length - 1].created_at;
-
       response = response.concat(data);
     }
     count++;
 
-    console.log("requests ", count, max_id, oldest, newest, "\n");
+    console.log('requests ', count, '\n', oldest, ' to ', newest, '\n');
     
-
+    // no more tweets from twitter:
     if (data.length < 2 || count === 15) {
-      // filter for geo data'd tweets and TODO hit database
-      console.log(response.length," tweets");
+      // filter for geo data'd tweets and insert into database
+      console.log(response.length,' tweets fetched from twitter');
       response = response.filter(function(v,k,c){ return v.geo;}).reverse();
-      console.log(response.length, " geo tweets");
+      console.log(response.length, ' tweets geocoded');
       
-      insertTweets(req.body.search, response).then(function(data){
-        console.log("inserted ", data.length);
-        fetchTweets(req.body.search).then(function(data){
-          console.log("retrieved ", data.length);
+      db.insertTweets(req.body.search, response).then(function(data){
+        console.log(data.length, ' inserted to DB');
+        db.fetchTweets(req.body.search).then(function(data){
+          console.log(data.length, ' retrieved from DB');
           res.json(data);
         });
       });
 
+    // still more tweets to go get, recurse:
     } else {
       twitterMachine(req.body.search, options).then( getMaxHistory );
     }

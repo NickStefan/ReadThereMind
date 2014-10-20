@@ -1,5 +1,5 @@
 var dblite = require('dblite');
-var db = dblite('./geonames-sqlite/geonames.sqlite3');
+var db = dblite('./geo/geonames-sqlite/geonames.sqlite3');
 var Promise = require('bluebird');
 
 function dbAsync(sql, strLocation) {

@@ -1,7 +1,7 @@
 var twitter = require('twitter');
-var sentiment = require('./sentimentHandler');
+var sentiment = require('../sentiment/sentimentHandler');
 var Promise = require('bluebird');
-var geoAsync = require('./geocoder');
+var geoAsync = require('../geo/geocoder');
 
 if (process.env.NODE_ENV === 'production') {
   config = process.env.twitRTMConfig;
@@ -14,7 +14,7 @@ var twitterClient = new twitter(config);
 function twitterSearchAsync(search,options) {
   return new Promise(function(resolve,reject){
     twitterClient.search(search,options,function(data){
-      console.log("success twitter", data.statuses.length);
+      console.log("success ", data.statuses.length, " tweets");
       resolve(data.statuses);
     });
   });
@@ -53,7 +53,7 @@ var getTweets = function(text, options, callback) {
     });
   })
   .then(function(response){
-      console.log("success sentiment", response.length);
+      console.log("success ", response.length, " sentiments");
       callback(response);
   });
 };
