@@ -60,13 +60,23 @@ router.post('/', function(req, res) {
       response = response.filter(function(v,k,c){ return v.geo;}).reverse();
       console.log(response.length, ' tweets geocoded');
       
-      db.insertTweets(req.body.search, response).then(function(data){
-        console.log(data.length, ' inserted to DB');
+      // if any new tweets geocoded, insert them and then retrieve all DB
+      if (response.length > 0) {
+        db.insertTweets(req.body.search, response).then(function(data){
+          console.log(data.length, ' inserted to DB');
+          db.fetchTweets(req.body.search).then(function(data){
+            console.log(data.length, ' retrieved from DB');
+            res.json(data);
+          });
+        });
+        
+      // else no new tweets geocoded, retrieve from DB
+      } else {
         db.fetchTweets(req.body.search).then(function(data){
           console.log(data.length, ' retrieved from DB');
           res.json(data);
         });
-      });
+      }
 
     // still more tweets to go get, recurse:
     } else {

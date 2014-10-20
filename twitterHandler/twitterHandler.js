@@ -41,14 +41,6 @@ var getTweets = function(text, options, callback) {
       resp.id = tweet.id;
       resp.created_at = tweet.created_at;
       resp.sentiment = sentiment(tweet.text).score;
-      resp.radius = (Math.abs(resp.sentiment) + 5) * 2;
-      if (resp.sentiment > 0) {
-        resp.fillKey = "green";
-      } else if (resp.sentiment < 0){
-        resp.fillKey = "red";
-      } else {
-        resp.fillKey = "blue";
-      }
       return resp;
     });
   })

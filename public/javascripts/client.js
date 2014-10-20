@@ -55,23 +55,49 @@ var scaleTime = function(min,max,scale){
 	}
 }
 
+var timeoutCodes = [];
+
 function updateMap(data) {
+  
+  // clear any timeouts from the old query
+  if (timeoutCodes.length > 0) {
+    timeoutCodes.forEach(function(v,k,c) {
+      clearTimeout(v);
+    });
+  }
+
   scaleTimeFunc = scaleTime(data[data.length-1].created_at, data[0].created_at, 20);
+  
+  // this stuff was originally on the server to increase
+  // the users perception of speed, but its more 'view logic'
+  // and such I've put it on the client for now.
+  data.forEach(function(v,k,c){
+    v.radius = (Math.abs(v.sentiment) + 5) * 1.5;
+      if (v.sentiment > 0) {
+        v.fillKey = "green";
+      } else if (v.sentiment < 0){
+        v.fillKey = "red";
+      } else {
+        v.fillKey = "blue";
+      }
+  });
   
   data.reverse().forEach(function(v,k,c){
 
-    setTimeout(function(){
+    var code = setTimeout(function(){
 
       map.bubbles(c.slice(0,k+1),{
 		    popupTemplate: function (geo, data) {
 		      return ['<div class="hoverinfo">' + data.screen_name + '<br/>' + data.text,
-		      '<br/>Date: ' +  data.created_at + '',
+		      '<br/>Date: ' +  data.created_at,
+          '<br/>Sentiment: ' + data.sentiment,
 		      '</div>'].join('');
 		    }
 		  });
 
     }, scaleTimeFunc(v.created_at));
-
+  
+    timeoutCodes.push(code);
   });
 
 }
