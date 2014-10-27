@@ -16,7 +16,7 @@ router.post('/', function(req, res) {
     if (results.length > 0) {
       dbAlready = results;
       console.log('results', results.length, '\n');
-      since_id = results[ results.length - 1 ].id;
+      since_id = results[ results.length - 1 ].properties.id;
       options.count = 100;
       options.since_id = since_id;
     
@@ -38,15 +38,15 @@ router.post('/', function(req, res) {
       //   no more tweets sent back,
       //   1500 tweets total sent to us,
       //   since_id reached (only if term already in DB collections)
-      max_id = data[data.length - 1].id - 1;
+      max_id = data[data.length - 1].properties.id - 1;
       options = {};
       options.count = 100;
       options.max_id = max_id;
       if (dbAlready) {
-        options.since_id = dbAlready[ dbAlready.length - 1 ].id;
+        options.since_id = dbAlready[ dbAlready.length - 1 ].properties.id;
       }
-      newest = data[0].created_at;
-      oldest = data[data.length - 1].created_at;
+      newest = data[0].properties.created_at;
+      oldest = data[data.length - 1].properties.created_at;
       response = response.concat(data);
     }
     count++;
@@ -57,7 +57,7 @@ router.post('/', function(req, res) {
     if (data.length < 2 || count === 15) {
       // filter for geo data'd tweets and insert into database
       console.log(response.length,' tweets fetched from twitter');
-      response = response.filter(function(v,k,c){ return v.geo;}).reverse();
+      response = response.filter(function(v,k,c){ return v.geometry;}).reverse();
       console.log(response.length, ' tweets geocoded');
       
       // if any new tweets geocoded, insert them and then retrieve all DB
@@ -66,7 +66,10 @@ router.post('/', function(req, res) {
           console.log(data.length, ' inserted to DB');
           db.fetchTweets(req.body.search).then(function(data){
             console.log(data.length, ' retrieved from DB');
-            res.json(data);
+            res.json({
+              type:"FeatureCollection",
+              features: data
+            });
           });
         });
         
@@ -74,7 +77,10 @@ router.post('/', function(req, res) {
       } else {
         db.fetchTweets(req.body.search).then(function(data){
           console.log(data.length, ' retrieved from DB');
-          res.json(data);
+          res.json({
+            type:"FeatureCollection",
+            features: data
+          });
         });
       }
 

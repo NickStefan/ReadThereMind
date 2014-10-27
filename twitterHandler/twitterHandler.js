@@ -23,24 +23,32 @@ function twitterSearchAsync(search,options) {
 var getTweets = function(text, options, callback) {
   
   twitterSearchAsync(text, options).map(function(tweet) {
-    var resp = {};
+    var resp = {
+      type: 'Feature',
+      properties: {}
+    };
     return geoAsync(tweet.geo, tweet.user.location).then(function(data){
       if (data === null || data[0] === undefined){
-        resp.geo = false;
+        resp.geometry = false;
       } else if (data[0].length > 2) {
-        resp.geo = true;
-        resp.latitude = data[0][6];
-        resp.longitude = data[0][7];
+        resp.geometry = {
+          type: "Point",
+          //coordinates: [data[0][6],data[0][7]]
+          coordinates: [data[0][7],data[0][6]]
+        };
       } else {
-        resp.geo = true;
-        resp.latitude = data[0];
-        resp.longitude = data[1];
+        resp.geometry = {
+          type: "Point",
+          //coordinates: [data[0],data[1]]
+          coordinates: [data[1],data[0]]
+        };
       }
-      resp.screen_name = tweet.user.screen_name;
-      resp.text = tweet.text;
-      resp.id = tweet.id;
-      resp.created_at = tweet.created_at;
-      resp.sentiment = sentiment(tweet.text).score;
+      resp.properties.location = tweet.user.location;
+      resp.properties.screen_name = tweet.user.screen_name;
+      resp.properties.text = tweet.text;
+      resp.properties.id = tweet.id;
+      resp.properties.created_at = tweet.created_at;
+      resp.properties.sentiment = sentiment(tweet.text).score;
       return resp;
     });
   })
