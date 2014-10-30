@@ -1,7 +1,8 @@
-var receiveData = function(data){
+var receiveData = function(dataObj){
+  var data = dataObj.features;
 	$('.results').html('');
 	for (var i = 0; i < data.length; i++){
-		var tweet = $('<div>').html(data[i].text + '<br>' + data[i].sentiment);
+		var tweet = $('<div>').html(data[i].properties.text + '<br>' + data[i].properties.sentiment);
 		$('.results').append(tweet);
 	}
 	updateMap(data);
@@ -25,29 +26,39 @@ var sendData = function(data){
 	});	
 }
 
-// var map = new Datamap({
-//   element: document.getElementById('container'),
-// 	scope: 'usa',
-// 	fills: {
-// 	        defaultFill: 'rgba(255,255,255,1)', //any hex, color name or rgb/rgba value
-// 	    		green: 'green',
-// 	    		red: 'red',
-// 	    		blue: 'blue',
-// 	    },
-// 	geographyConfig: {
-// 	  borderColor: 'black',
-// 	  highlightOnHover: false
-// 	}
-// });
-
-var map = L.mapbox.map('container', 'fcc.map-toolde8w')
+// create the map
+var map = L.mapbox.map('container', 'examples.map-i875kd35') // darker map: 'fcc.map-toolde8w'
     .setView([40, -94.50], 4);
-  // queue()
-  //   .defer(d3.json, "test.geojson")
-  //   .await(ready);
-  // function ready(error, data){
-  //   L.geoJson(data).addTo(map);
-  //   }
+
+// functions for rendering map tweets
+
+var pointColor = function(feature) {
+      return feature.properties.sentiment > 0 ? '#f55' : '#a00';
+  }
+
+var pointRadius = function(feature) {
+    return feature.properties.sentiment;
+}
+
+var scaledPoint = function(feature, latlng) {
+    return L.circleMarker(latlng, {
+        radius: pointRadius(feature),
+        fillColor: pointColor(feature),
+        fillOpacity: 0.7,
+        weight: 0.5,
+        color: '#fff'
+    }).bindPopup(
+        '<h3>' + feature.properties.location + '</h3>' + 
+        '<h2>' + feature.properties.screen_name + '</h2>' +
+        '<h3>' + feature.properties.text + '</h3>' +
+        '<h3>' + new Date(feature.properties.created_at) + '</h3>' +
+        feature.properties.sentiment + ' sentiment');
+}
+
+// Create a new layer with a special pointToLayer function
+// that'll generate scaled points.
+var tweetsLayer = L.geoJson(null, { pointToLayer: scaledPoint })
+  .addTo(map);
 
 var scaleTime = function(min,max,scale){
 	// scale is the scale in seconds that you want to transform into
@@ -67,76 +78,27 @@ var scaleTime = function(min,max,scale){
 var timeoutCodes = [];
 
 function updateMap(data) {
-// Create a new layer with a special pointToLayer function
-// that'll generate scaled points.
-var tweetsLayer = L.geoJson(null, { pointToLayer: scaledPoint })
-    .addTo(map);
 
-tweetsLayer.addData(data);
+  // clear any timeouts from the old query
+  if (timeoutCodes.length > 0) {
+    timeoutCodes.forEach(function(v,k,c) {
+      clearTimeout(v);
+    });
+  }
 
-function pointColor(feature) {
-    return feature.properties.sentiment > 0 ? '#f55' : '#a00';
-}
-
-function pointRadius(feature) {
-    return feature.properties.sentiment;
-}
-
-function scaledPoint(feature, latlng) {
-    return L.circleMarker(latlng, {
-        radius: pointRadius(feature),
-        fillColor: pointColor(feature),
-        fillOpacity: 0.7,
-        weight: 0.5,
-        color: '#fff'
-    }).bindPopup(
-        '<h3>' + feature.properties.location + '</h3>' + 
-        '<h2>' + feature.properties.screen_name + '</h2>' +
-        '<h3>' + feature.properties.text + '</h3>' +
-        '<h3>' + new Date(feature.properties.created_at) + '</h3>' +
-        feature.properties.sentiment + ' sentiment');
-}
-
-  // // clear any timeouts from the old query
-  // if (timeoutCodes.length > 0) {
-  //   timeoutCodes.forEach(function(v,k,c) {
-  //     clearTimeout(v);
-  //   });
-  // }
-
-  // scaleTimeFunc = scaleTime(data[data.length-1].created_at, data[0].created_at, 20);
+  scaleTimeFunc = scaleTime(data[data.length-1].properties.created_at, data[0].properties.created_at, 20);
   
-  // // this stuff was originally on the server to increase
-  // // the users perception of speed, but its more 'view logic'
-  // // and such I've put it on the client for now.
-  // data.forEach(function(v,k,c){
-  //   v.radius = (Math.abs(v.sentiment) + 5) * 1.5;
-  //     if (v.sentiment > 0) {
-  //       v.fillKey = "green";
-  //     } else if (v.sentiment < 0){
-  //       v.fillKey = "red";
-  //     } else {
-  //       v.fillKey = "blue";
-  //     }
-  // });
+  data.reverse().forEach(function(v,k,c){
+
+    var code = setTimeout(function(){
+      
+      tweetsLayer.clearLayers();
+      tweetsLayer.addData(c.slice(0,k+1));
+
+    }, scaleTimeFunc(v.properties.created_at));
   
-  // data.reverse().forEach(function(v,k,c){
-
-  //   var code = setTimeout(function(){
-
-  //     map.bubbles(c.slice(0,k+1),{
-		//     popupTemplate: function (geo, data) {
-		//       return ['<div class="hoverinfo">' + data.screen_name + '<br/>' + data.text,
-		//       '<br/>Date: ' +  data.created_at,
-  //         '<br/>Sentiment: ' + data.sentiment,
-		//       '</div>'].join('');
-		//     }
-		//   });
-
-  //   }, scaleTimeFunc(v.created_at));
-  
-  //   timeoutCodes.push(code);
-  // });
+    timeoutCodes.push(code);
+  });
 
 }
 

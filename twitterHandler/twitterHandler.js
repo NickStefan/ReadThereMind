@@ -14,8 +14,13 @@ var twitterClient = new twitter(config);
 function twitterSearchAsync(search,options) {
   return new Promise(function(resolve,reject){
     twitterClient.search(search,options,function(data){
-      console.log("success ", data.statuses.length, " tweets");
-      resolve(data.statuses);
+      if (data.statuses !== undefined){
+        console.log("success ", data.statuses.length, " tweets");
+        resolve(data.statuses);
+      } else {
+        console.log("success ", 0, " tweets");
+        resolve(data);
+      }
     });
   });
 }
