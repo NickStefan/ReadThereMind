@@ -33,11 +33,20 @@ var map = L.mapbox.map('container', 'examples.map-i875kd35') // darker map: 'fcc
 // functions for rendering map tweets
 
 var pointColor = function(feature) {
-      return feature.properties.sentiment > 0 ? '#f55' : '#a00';
+    var sentiment = feature.properties.sentiment;
+    var color;
+    if (sentiment > 0) {
+      color = 'rgb(12,178,0)';
+    } else if (sentiment === 0) {
+      color = 'rgb(77,62,178)';
+    } else {
+      color = 'rgb(255,105,0)';
+    }
+    return color;
   }
 
 var pointRadius = function(feature) {
-    return feature.properties.sentiment;
+    return (feature.properties.sentiment > 5) * 1.2 ? feature.properties.sentiment : 5;
 }
 
 var scaledPoint = function(feature, latlng) {
@@ -51,7 +60,7 @@ var scaledPoint = function(feature, latlng) {
         '<h3>' + feature.properties.location + '</h3>' + 
         '<h2>' + feature.properties.screen_name + '</h2>' +
         '<h3>' + feature.properties.text + '</h3>' +
-        '<h3>' + new Date(feature.properties.created_at) + '</h3>' +
+        '<h3>' + moment(feature.properties.created_at, 'dd MMM DD HH:mm:ss ZZ YYYY', 'en').calendar() + '</h3>' +
         feature.properties.sentiment + ' sentiment');
 }
 
@@ -85,16 +94,15 @@ function updateMap(data) {
       clearTimeout(v);
     });
   }
+  // clear any pre-existing map data
+  tweetsLayer.clearLayers();
 
   scaleTimeFunc = scaleTime(data[data.length-1].properties.created_at, data[0].properties.created_at, 20);
   
-  data.reverse().forEach(function(v,k,c){
+  data.forEach(function(v,k,c){
 
     var code = setTimeout(function(){
-      
-      tweetsLayer.clearLayers();
-      tweetsLayer.addData(c.slice(0,k+1));
-
+      tweetsLayer.addData(v);
     }, scaleTimeFunc(v.properties.created_at));
   
     timeoutCodes.push(code);
