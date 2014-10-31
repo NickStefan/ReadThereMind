@@ -84,6 +84,12 @@ var scaleTime = function(min,max,scale){
 	}
 }
 
+var nearest = function(n, v) {
+  n = n / v;
+  n = (n < 0 ? Math.floor(n) : Math.ceil(n)) * v;
+  return n;
+}
+
 var timeoutCodes = [];
 
 function updateMap(data) {
@@ -97,17 +103,24 @@ function updateMap(data) {
   // clear any pre-existing map data
   tweetsLayer.clearLayers();
 
-  scaleTimeFunc = scaleTime(data[data.length-1].properties.created_at, data[0].properties.created_at, 20);
-  
-  data.forEach(function(v,k,c){
+  scaleTimeFunc = scaleTime(data[data.length-1].properties.created_at, data[0].properties.created_at, 30);
+
+  data.reverse().forEach(function(v,k,c){
 
     var code = setTimeout(function(){
       tweetsLayer.addData(v);
+      // programmatically open the popup
+      var id = Object.keys(tweetsLayer._layers).sort(function(a,b){return parseInt(b) - parseInt(a);})[0];
+      var latlng = {latlng: L.latLng(v.geometry.coordinates[1], v.geometry.coordinates[0]) };
+      
+      if (nearest(scaleTimeFunc(v.properties.created_at),1000) % 5000 === 0){
+        tweetsLayer._layers[id]._openPopup(latlng);
+      }
+
     }, scaleTimeFunc(v.properties.created_at));
   
     timeoutCodes.push(code);
   });
-
 }
 
 
