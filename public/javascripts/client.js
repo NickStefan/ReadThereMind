@@ -61,27 +61,24 @@ var scaledPoint = function(feature, latlng) {
         '<h2>' + feature.properties.screen_name + '</h2>' +
         '<h3>' + feature.properties.text + '</h3>' +
         '<h3>' + moment(feature.properties.created_at, 'dd MMM DD HH:mm:ss ZZ YYYY', 'en').calendar() + '</h3>' +
-        feature.properties.sentiment + ' sentiment');
+        '<h1>' + feature.properties.sentiment + ' sentiment' + '</h1>'
+      );
 }
 
-// Create a new layer with a special pointToLayer function
-// that'll generate scaled points.
-var tweetsLayer = L.geoJson(null, { pointToLayer: scaledPoint })
-  .addTo(map);
-
+// helper functions for calculations
 var scaleTime = function(min,max,scale){
-	// scale is the scale in seconds that you want to transform into
-	var maxTime = moment(max, 'dd MMM DD HH:mm:ss ZZ YYYY', 'en');
+  // scale is the scale in seconds that you want to transform into
+  var maxTime = moment(max, 'dd MMM DD HH:mm:ss ZZ YYYY', 'en');
   var minTime = moment(min, 'dd MMM DD HH:mm:ss ZZ YYYY', 'en');
   var duration = moment.duration(maxTime - minTime);
   var elapse = duration.asHours() * 60;
 
-	return function(arg){
-		var locMax = moment(arg, 'dd MMM DD HH:mm:ss ZZ YYYY', 'en');
+  return function(arg){
+    var locMax = moment(arg, 'dd MMM DD HH:mm:ss ZZ YYYY', 'en');
     var localElapse = moment.duration(locMax - minTime).asHours() * 60 / elapse;
     // 1000 is for milliseconds, as setTimeout will take milliseconds
     return localElapse * scale * 1000;
-	}
+  }
 }
 
 var nearest = function(n, v) {
@@ -90,37 +87,88 @@ var nearest = function(n, v) {
   return n;
 }
 
+// Create a new layer with a special pointToLayer function
+// that'll generate scaled points.
+var tweetsLayer = L.geoJson(null, { pointToLayer: scaledPoint })
+  .addTo(map);
+
 var timeoutCodes = [];
+var statusCodes = [];
+var displayed = {};
 
 function updateMap(data) {
 
-  // clear any timeouts from the old query
-  if (timeoutCodes.length > 0) {
+  // clear any timeouts, pre-existing map data, and pop ups from the old query
+  if (timeoutCodes.length > 0){
     timeoutCodes.forEach(function(v,k,c) {
       clearTimeout(v);
     });
   }
-  // clear any pre-existing map data
+  if (statusCodes.length > 0){
+    statusCodes.forEach(function(v,k,c) {
+      clearTimeout(v);
+    });
+  }
   tweetsLayer.clearLayers();
+  displayed = {};
 
-  scaleTimeFunc = scaleTime(data[data.length-1].properties.created_at, data[0].properties.created_at, 30);
+  // calculate the time scale to display the tweets over
 
-  data.reverse().forEach(function(v,k,c){
+  secondsRange = nearest(data.length,100) / 20;
+  scaleTimeFunc = scaleTime(data[0].properties.created_at, data[data.length-1].properties.created_at, secondsRange);
+
+  // for each tweet, set a delay to add new tweet
+  data.forEach(function(v,k,c){
 
     var code = setTimeout(function(){
       tweetsLayer.addData(v);
       // programmatically open the popup
       var id = Object.keys(tweetsLayer._layers).sort(function(a,b){return parseInt(b) - parseInt(a);})[0];
       var latlng = {latlng: L.latLng(v.geometry.coordinates[1], v.geometry.coordinates[0]) };
+      var time = nearest(scaleTimeFunc(v.properties.created_at),1000);
       
-      if (nearest(scaleTimeFunc(v.properties.created_at),1000) % 5000 === 0){
-        tweetsLayer._layers[id]._openPopup(latlng);
+      // only open 1 popup for every second
+      if (!displayed[time]){
+        if (time % 1000 === 0) {
+          tweetsLayer._layers[id]._openPopup(latlng);
+          displayed[time] = true;
+        }
       }
-
+    // add each tweet on a scaled time scale rather than actual time scale
+    // ie new tweets that are hours apart are added seconds apart etc
     }, scaleTimeFunc(v.properties.created_at));
   
     timeoutCodes.push(code);
   });
+  
+  // for each second in the tweet time scale, update status bar
+  map.legendControl.addLegend('<div></div>');
+
+  d3.select('.map-legend').append('svg')
+    .attr('class','legendary')
+    .style('max-width', secondsRange + 'px')
+    .style('max-height','40' + 'px');
+
+  d3.select('.legendary').append('rect')
+        .attr("x", 10)
+        .attr("y", 10)
+        .attr("width", secondsRange)
+        .attr("height", 20)
+        .attr("fill", 'blue');
+
+  var j = 0;
+  for (var i = 0; i < secondsRange; i++){
+    var code = setTimeout(function(){
+      d3.select('.legendary').append('rect')
+        .attr("x", 10)
+        .attr("y", 10)
+        .attr("width", j++)
+        .attr("height", 20);
+    },i*1000);
+
+    statusCodes.push(code);
+  }
+
 }
 
 
