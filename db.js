@@ -1,6 +1,11 @@
 var Promise = require('bluebird');
 var mongo = require('mongoskin');
-var db = mongo.db('mongodb://localhost:27017/tweets',{native_parser:true});
+
+var mongoUri = process.env.MONGOLAB_URI ||
+  process.env.MONGOHQ_URL ||
+  'mongodb://localhost:27017/tweets';
+
+var db = mongo.db(mongoUri,{native_parser:true});
 
 var fetchTweets = function(search){
   return new Promise(function(resolve,reject){

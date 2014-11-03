@@ -2,9 +2,13 @@ var twitter = require('twitter');
 var sentiment = require('../sentiment/sentimentHandler');
 var Promise = require('bluebird');
 var geoAsync = require('../geo/geocoder');
+var config = {};
 
 if (process.env.NODE_ENV === 'production') {
-  config = process.env.twitRTMConfig;
+  config.consumer_key = process.env.twit_consumer_key;
+  consumer_secret = process.env.twit_consumer_secret;
+  access_token_key = process.env.twit_token_key;
+  access_token_secret = process.env.twit_token_secret;
 } else {
   config = require('./twitterKeys');
 }

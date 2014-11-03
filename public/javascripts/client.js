@@ -1,11 +1,11 @@
 $(function(){
-  // set the map width on page load
+  // set the map width and height on page load
   var width = $(window).width() - 20;
   var height = $(window).height() - 100;
   $('#map-container').css('width',width + 'px');
   $('#map-container').css('height',height + 'px');
 
-
+  // handle AJAX requests
   var receiveData = function(dataObj){
     var data = dataObj.features;
   	updateMap(data);
@@ -73,6 +73,8 @@ $(function(){
   }
 
   // helper functions for calculations
+
+  // scale hours down to seconds
   var scaleTime = function(min,max,scale){
     // scale is the scale in seconds that you want to transform into
     var maxTime = moment(max, 'dd MMM DD HH:mm:ss ZZ YYYY', 'en');
@@ -87,7 +89,8 @@ $(function(){
       return localElapse * scale * 1000;
     }
   }
-
+  
+  // round to nearest n (ie 10 or 100 or 1000)
   var nearest = function(n, v) {
     n = n / v;
     n = (n < 0 ? Math.floor(n) : Math.ceil(n)) * v;
