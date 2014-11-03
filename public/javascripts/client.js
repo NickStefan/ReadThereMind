@@ -5,12 +5,22 @@ $(function(){
   $('#map-container').css('width',width + 'px');
   $('#map-container').css('height',height + 'px');
 
-  // handle AJAX requests
+  // show loading animation on AJAX
+  var showPleaseWait = function() {
+    $('#Searching_Modal').modal('show');
+  }
+  var hidePleaseWait = function () {
+    $('#Searching_Modal').modal('hide');
+  }
+  
+  // update page on AJAX success
   var receiveData = function(dataObj){
+    hidePleaseWait();
     var data = dataObj.features;
   	updateMap(data);
   }
-
+  
+  // AJAX tweet search
   $('#findSentiment').submit(function(e){
   	e.preventDefault();
     var search = $('#search').val();
@@ -20,6 +30,7 @@ $(function(){
   });
 
   var sendData = function(data){
+    showPleaseWait();
   	$.ajax({
   	  type: 'POST',
   	  url: '/api/',
