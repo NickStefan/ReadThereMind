@@ -1,7 +1,7 @@
 $(function(){
   // set the map width on page load
   var width = $(window).width() - 20;
-  var height = width > 400 ? width * 0.6 : 400;
+  var height = $(window).height() - 100;
   $('#map-container').css('width',width + 'px');
   $('#map-container').css('height',height + 'px');
 
@@ -64,11 +64,11 @@ $(function(){
         weight: 0.5,
         color: '#fff'
     }).bindPopup(
-        '<h3>' + feature.properties.location + '</h3>' + 
-        '<h2>' + feature.properties.screen_name + '</h2>' +
-        '<h3>' + feature.properties.text + '</h3>' +
-        '<h3>' + moment(feature.properties.created_at, 'dd MMM DD HH:mm:ss ZZ YYYY', 'en').calendar() + '</h3>' +
-        '<h1>' + sentiment + ' sentiment' + '</h1>'
+        '<h4>' + feature.properties.location + '</h4>' + 
+        '<h3>' + feature.properties.screen_name + '</h3>' +
+        '<h4>' + feature.properties.text + '</h4>' +
+        '<h4>' + moment(feature.properties.created_at, 'dd MMM DD HH:mm:ss ZZ YYYY', 'en').calendar() + '</h4>' +
+        '<h3>' + sentiment + ' sentiment' + '</h3>'
       );
   }
 

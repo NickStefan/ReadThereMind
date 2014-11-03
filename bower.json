@@ -12,6 +12,7 @@
   ],
   "dependencies": {
     "jquery": "~2.1.1",
-    "datamaps": "~0.3.4"
+    "datamaps": "~0.3.4",
+    "bootstrap": "~3.3.0"
   }
 }
