@@ -30,13 +30,20 @@ $(function(){
   });
 
   var sendData = function(data){
+    var dat = data;
     showPleaseWait();
   	$.ajax({
   	  type: 'POST',
   	  url: '/api/',
   	  data: {search:data},
   	  dataType: 'json',
-  	  success: receiveData
+      timeout: 30000,
+  	  success: receiveData,
+      error: function(xhr,err){
+        if (err === 'timeout'){
+          sendData(dat);
+        }
+      }
   	});	
   };
 
