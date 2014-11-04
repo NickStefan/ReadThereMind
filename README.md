@@ -7,10 +7,9 @@ Visualizes twitter sentiment over space and time on an animated map.
 * Twitter npm module
 * Sentiment npm module
 * Bluebird promises
-* SQLite3 db for geocoding geo-less tweets
-* MongoDB for app persistance
+* MongoDB for app persistance and manual geocoding
 
-Server asynchronously and recursively queries Twitter API without paging. Most tweets on twitter are not geocoded, and I therefore needed to geocode them manually. Manual geocoding was done by querying a SQLite db created from a tsv of geonames.org.
+Server asynchronously and recursively queries Twitter API without paging. Most tweets on twitter are not geocoded, and I therefore needed to geocode them manually. I loaded mongodb with geo data from the geonames.org tsv. The db is then queried with a regex match in order to geocode location-less tweets.
 
 ### Front End
 * d3.js

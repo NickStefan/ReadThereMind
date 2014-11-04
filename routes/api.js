@@ -8,6 +8,11 @@ router.post('/', function(req, res) {
   var dbAlready;
   var count = 0;
 
+  // cant search geonames as thats our geocoding collection
+  if (req.body.search === 'geoname'){
+    req.body.search = 'geonames';
+  }
+
   db.fetchTweets(req.body.search).then(function(results){
     var options = {};
     // if searched term in database as a collection:

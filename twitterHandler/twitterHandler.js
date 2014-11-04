@@ -1,14 +1,14 @@
 var twitter = require('twitter');
 var sentiment = require('../sentiment/sentimentHandler');
 var Promise = require('bluebird');
-var geoAsync = require('../geo/geocoder');
+var geoAsync = require('../db').geoAsync;
 var config = {};
 
 if (process.env.NODE_ENV === 'production') {
   config.consumer_key = process.env.twit_consumer_key;
-  consumer_secret = process.env.twit_consumer_secret;
-  access_token_key = process.env.twit_token_key;
-  access_token_secret = process.env.twit_token_secret;
+  config.consumer_secret = process.env.twit_consumer_secret;
+  config.access_token_key = process.env.twit_token_key;
+  config.access_token_secret = process.env.twit_token_secret;
 } else {
   config = require('./twitterKeys');
 }
@@ -23,7 +23,8 @@ function twitterSearchAsync(search,options) {
         resolve(data.statuses);
       } else {
         console.log("success ", 0, " tweets");
-        resolve(data);
+        console.log(data);
+        resolve([]);
       }
     });
   });
@@ -39,16 +40,9 @@ var getTweets = function(text, options, callback) {
     return geoAsync(tweet.geo, tweet.user.location).then(function(data){
       if (data === null || data[0] === undefined){
         resp.geometry = false;
-      } else if (data[0].length > 2) {
-        resp.geometry = {
-          type: "Point",
-          //coordinates: [data[0][6],data[0][7]]
-          coordinates: [data[0][7],data[0][6]]
-        };
       } else {
         resp.geometry = {
           type: "Point",
-          //coordinates: [data[0],data[1]]
           coordinates: [data[1],data[0]]
         };
       }
