@@ -1,7 +1,7 @@
 {
-  "name": "2014-09-solo",
-  "version": "0.0.0",
-  "homepage": "https://github.com/NickStefan/2014-09-solo",
+  "name": "readtheremind",
+  "version": "0.0.1",
+  "homepage": "https://github.com/NickStefan/readtheremind",
   "license": "MIT",
   "ignore": [
     "**/.*",
@@ -12,7 +12,8 @@
   ],
   "dependencies": {
     "jquery": "~2.1.1",
-    "datamaps": "~0.3.4",
-    "bootstrap": "~3.3.0"
+    "bootstrap": "~3.3.0",
+    "moment": "~2.8.3",
+    "d3": "~3.4.13"
   }
 }

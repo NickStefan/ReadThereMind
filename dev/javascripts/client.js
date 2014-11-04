@@ -8,17 +8,17 @@ $(function(){
   // show loading animation on AJAX
   var showPleaseWait = function() {
     $('#Searching_Modal').modal('show');
-  }
+  };
   var hidePleaseWait = function () {
     $('#Searching_Modal').modal('hide');
-  }
+  };
   
   // update page on AJAX success
   var receiveData = function(dataObj){
     hidePleaseWait();
     var data = dataObj.features;
   	updateMap(data);
-  }
+  };
   
   // AJAX tweet search
   $('#findSentiment').submit(function(e){
@@ -38,7 +38,7 @@ $(function(){
   	  dataType: 'json',
   	  success: receiveData
   	});	
-  }
+  };
 
   // create the map
   var map = L.mapbox.map('map-container', 'examples.map-i875kd35') // darker map: 'fcc.map-toolde8w'
@@ -47,21 +47,21 @@ $(function(){
   // functions for rendering map tweets
 
   var pointColor = function(feature) {
-      var sentiment = feature.properties.sentiment;
-      var color;
-      if (sentiment > 0) {
-        color = 'rgb(12,178,0)';
-      } else if (sentiment === 0) {
-        color = 'rgb(77,62,178)';
-      } else {
-        color = 'rgb(255,105,0)';
-      }
-      return color;
+    var sentiment = feature.properties.sentiment;
+    var color;
+    if (sentiment > 0) {
+      color = 'rgb(12,178,0)';
+    } else if (sentiment === 0) {
+      color = 'rgb(77,62,178)';
+    } else {
+      color = 'rgb(255,105,0)';
     }
+    return color;
+  };
 
   var pointRadius = function(feature) {
     return (feature.properties.sentiment > 5) * 1.2 ? feature.properties.sentiment : 5;
-  }
+  };
 
   var scaledPoint = function(feature, latlng) {
     var sentiment = feature.properties.sentiment > 0 ?
@@ -69,19 +69,19 @@ $(function(){
       feature.properties.sentiment;
 
     return L.circleMarker(latlng, {
-        radius: pointRadius(feature),
-        fillColor: pointColor(feature),
-        fillOpacity: 0.7,
-        weight: 0.5,
-        color: '#fff'
+      radius: pointRadius(feature),
+      fillColor: pointColor(feature),
+      fillOpacity: 0.7,
+      weight: 0.5,
+      color: '#fff'
     }).bindPopup(
-        '<h4>' + feature.properties.location + '</h4>' + 
-        '<h3>' + feature.properties.screen_name + '</h3>' +
-        '<h4>' + feature.properties.text + '</h4>' +
-        '<h4>' + moment(feature.properties.created_at, 'dd MMM DD HH:mm:ss ZZ YYYY', 'en').calendar() + '</h4>' +
-        '<h3>' + sentiment + ' sentiment' + '</h3>'
-      );
-  }
+      '<h4>' + feature.properties.location + '</h4>' + 
+      '<h3>' + feature.properties.screen_name + '</h3>' +
+      '<h4>' + feature.properties.text + '</h4>' +
+      '<h4>' + moment(feature.properties.created_at, 'dd MMM DD HH:mm:ss ZZ YYYY', 'en').calendar() + '</h4>' +
+      '<h3>' + sentiment + ' sentiment' + '</h3>'
+    );
+  };
 
   // helper functions for calculations
 
@@ -98,15 +98,15 @@ $(function(){
       var localElapse = moment.duration(locMax - minTime).asHours() * 60 / elapse;
       // 1000 is for milliseconds, as setTimeout will take milliseconds
       return localElapse * scale * 1000;
-    }
-  }
+    };
+  };
   
   // round to nearest n (ie 10 or 100 or 1000)
   var nearest = function(n, v) {
     n = n / v;
     n = (n < 0 ? Math.floor(n) : Math.ceil(n)) * v;
     return n;
-  }
+  };
 
   // Create a new layer with a special pointToLayer function
   // that'll generate scaled points.
@@ -180,6 +180,7 @@ $(function(){
       .attr("height", 20)
       .attr("fill", 'lightblue');
 
+    /* jshint ignore:start */
     var j = 0;
     var t = 0;
     for (var i = 0; i < secondsRange; i++){
@@ -201,6 +202,7 @@ $(function(){
 
       statusCodes.push(code);
     }
+    /* jshint ignore:end */
 
   }
 

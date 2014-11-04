@@ -3,7 +3,11 @@ var router = express.Router();
 
 /* GET home page. */
 router.get('/', function(req, res) {
-  res.render('index', { cache: false, title: 'ReadThereMind' });
+  res.render('index', { 
+    cache: false, 
+    title: 'ReadThereMind',
+    environment: process.env.NODE_ENV 
+  });
 });
 
 module.exports = router;
