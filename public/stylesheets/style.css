@@ -12,6 +12,22 @@ a {
   color: #00B7FF;
 }
 
+.modal-info-top {
+  max-width: 300px;
+  margin: 50px auto 20px;
+  color: #fff;
+  text-align: center;
+  padding-left: 40px;
+}
+
+.modal-info-bottom {
+  max-width: 300px;
+  margin: 20px auto -50px;
+  color: #fff;
+  text-align: center;
+  padding-left: 40px;
+}
+
 .modal-body, .modal-content {
   background: none;
   -webkit-box-shadow: 0 5px 15px rgba(0,0,0,0);
