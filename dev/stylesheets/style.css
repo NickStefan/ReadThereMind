@@ -12,7 +12,11 @@ a {
   color: #00B7FF;
 }
 
-.modal-info-top {
+#Error_Modal {
+
+}
+
+.searching-modal .modal-info-top {
   max-width: 300px;
   margin: 50px auto 20px;
   color: #fff;
@@ -20,7 +24,7 @@ a {
   padding-left: 40px;
 }
 
-.modal-info-bottom {
+.searching-modal .modal-info-bottom {
   max-width: 300px;
   margin: 20px auto -50px;
   color: #fff;
@@ -28,7 +32,8 @@ a {
   padding-left: 40px;
 }
 
-.modal-body, .modal-content {
+.searching-modal .modal-body, 
+.searching-modal .modal-content {
   background: none;
   -webkit-box-shadow: 0 5px 15px rgba(0,0,0,0);
   -moz-box-shadow: 0 5px 15px rgba(0,0,0,0);
@@ -36,7 +41,10 @@ a {
   box-shadow: 0 5px 15px rgba(0,0,0,0);
 }
 
-.modal-dialogue, .modal, .modal-body, .modal-content {
+.searching-modal .modal-dialogue, 
+.searching-modal .modal,  
+.searching-modal .modal-body, 
+.searching-modal .modal-content {
   border: none;
   margin-left: -20px;
 }

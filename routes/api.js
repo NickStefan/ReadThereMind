@@ -59,7 +59,7 @@ router.post('/', function(req, res) {
     console.log('requests ', count, '\n', oldest, ' to ', newest, '\n');
     
     // no more tweets from twitter:
-    if (data.length < 2 || count === 15) {
+    if (data.length < 2 || count === 10) {
       // filter for geo data'd tweets and insert into database
       console.log(response.length,' tweets fetched from twitter');
       response = response.filter(function(v,k,c){ return v.geometry;}).reverse();

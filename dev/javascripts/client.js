@@ -9,8 +9,11 @@ $(function(){
   var showPleaseWait = function() {
     $('#Searching_Modal').modal('show');
   };
-  var hidePleaseWait = function () {
+  var hidePleaseWait = function() {
     $('#Searching_Modal').modal('hide');
+  };
+  var showError = function() {
+    $('#Error_Modal').modal('show');
   };
   
   // update page on AJAX success
@@ -42,6 +45,9 @@ $(function(){
       error: function(xhr,err){
         if (err === 'timeout'){
           sendData(dat);
+        } else {
+          hidePleaseWait();
+          showError();
         }
       }
   	});	
