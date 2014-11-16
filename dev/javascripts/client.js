@@ -148,7 +148,7 @@ $(function(){
 
     // calculate the time scale to display the tweets over
 
-    secondsRange = nearest(data.length,100) / 20;
+    secondsRange = Math.min( (nearest(data.length,100) / 20), 30); // no longer than 30 seconds
     scaleTimeFunc = scaleTime(data[0].properties.created_at, data[data.length-1].properties.created_at, secondsRange);
 
     // for each tweet, set a delay to add new tweet
