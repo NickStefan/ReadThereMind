@@ -58,7 +58,7 @@ gulp.task('default', ['lint', 'test', 'minify-css', 'scripts']);
 
 // Dev Task
 gulp.task('dev', function () {
-  nodemon({ script: './bin/www', ext: 'html js', ignore: [] })
+  nodemon({ script: 'server.js', ext: 'html js', ignore: [] })
     .on('start', ['lint','test'])
     .on('change', ['lint','test'])
     .on('restart', function () {

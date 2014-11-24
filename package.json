@@ -6,7 +6,7 @@
     "node": "0.10.29"
   },
   "scripts": {
-    "start": "node ./bin/www",
+    "start": "node server.js",
     "postinstall": "bower install && gulp"
   },
   "dependencies": {

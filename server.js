@@ -66,5 +66,57 @@ app.use(function(err, req, res, next) {
     });
 });
 
+///// SET UP SERVER TO HANDLE SOCKETS
+
+var debug = require('debug')('readtheremind');
+
+app.set('port', process.env.PORT || 3000);
+
+var server = app.listen(app.get('port'), function() {
+  debug('Express server listening on port ' + server.address().port);
+});
+
+if (process.env.NODE_ENV === 'production') {
+  console.log('port', process.env.PORT);
+  console.log('environment', process.env.NODE_ENV);
+} else {
+  console.log('port', 3000);
+  console.log('environment', 'development');
+}
+
+// socket io
+var io = require('socket.io').listen(server);
+
+var usernames = {};
+var clients = {};
+var clientNumber = 0;
+
+// io.on('connection', function (socket) {
+//   var success = false;
+//   console.log('user attempting to connect...');
+
+//   socket.on('addUser', function(username){
+//     socket.username = username;
+//     socket.usernameID = username + clientNumber.toString()
+//     clientNumber += 1;
+//     clients[ socket.usernameID ] = socket;
+//     usernames[ socket.usernameID ] = username;
+//     success = true;
+
+//     console.log(username + " has successfully connected.");
+//     console.log("online users", usernames);
+
+//     socket.emit('login', {
+//       usernames: usernames,
+//       username: username
+//     });
+    
+//     socket.broadcast.emit('userJoined', {
+//       username: socket.username
+//     });
+    
+//   });
+// });
+
 
 module.exports = app;
