@@ -105,7 +105,7 @@ var geocoder = function(givenGeo,strLocation,cb){
     return cb(null, givenGeo.coordinates);
   } else {
     // regex out any non alpha characters, but leave in , (it needs to stay in for this step)
-    var strLocation1 = strLocation.replace(/[^a-zA-z\s,]|_|\[|\]/gi,"");
+    var strLocation1 = strLocation.replace(/[^a-zA-z\s,]|_|\[|\]|\\|\//gi,"");
     // regex out any leading, double and end spaces, and ', CA'
     var strLocation2 = strLocation1.replace(/^\s+|\s+$|\s+(?=\s)|,.+/gi,"");
     // regex out any non alpha or space character

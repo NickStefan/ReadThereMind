@@ -1,3 +1,6 @@
+// expose these to sox.js file
+var tweetsLayer, sendData;
+
 $(function(){
 
   // set the map width and height on page load
@@ -24,7 +27,7 @@ $(function(){
   	updateMap(data);
   };
 
-  var sendData = function(data){
+  sendData = function(data){
     var dat = data;
     showPleaseWait();
   	$.ajax({
@@ -116,7 +119,7 @@ $(function(){
 
   // Create a new layer with a special pointToLayer function
   // that'll generate scaled points.
-  var tweetsLayer = L.geoJson(null, { pointToLayer: scaledPoint })
+  tweetsLayer = L.geoJson(null, { pointToLayer: scaledPoint })
     .addTo(map);
 
   var timeoutCodes = [];
