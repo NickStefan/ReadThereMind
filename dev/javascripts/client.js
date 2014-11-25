@@ -1,4 +1,5 @@
 $(function(){
+
   // set the map width and height on page load
   var width = $(window).width() - 20;
   var height = $(window).height() - 100;
@@ -22,15 +23,6 @@ $(function(){
     var data = dataObj.features;
   	updateMap(data);
   };
-  
-  // AJAX tweet search
-  $('#findSentiment').submit(function(e){
-  	e.preventDefault();
-    var search = $('#search').val();
-    sendData(search);
-    $('#search').val('');
-    $('#searchTerm').text(search);
-  });
 
   var sendData = function(data){
     var dat = data;
@@ -44,7 +36,8 @@ $(function(){
   	  success: receiveData,
       error: function(xhr,err){
         if (err === 'timeout'){
-          sendData(dat);
+          hidePleaseWait();
+          alert("Connection Failed");
         } else {
           hidePleaseWait();
           showError();

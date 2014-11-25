@@ -44,7 +44,8 @@ gulp.task('scripts', function() {
     './dev/javascripts/vendor/bootstrap.min.js',
     './dev/javascripts/vendor/d3.min.js',
     './dev/javascripts/vendor/moment.min.js',
-    './dev/javascripts/*.js'
+    './dev/javascripts/client.js',
+    './dev/javascripts/sox.js',
     ])
     .pipe(concat('all.js'))
     .pipe(gulp.dest('./dist/js'))

@@ -18,6 +18,8 @@
     {% block content %}
     {% endblock %}
 
+    <script src="/socket.io/socket.io.js"></script>
+    
     {% if environment === 'production' %}
       <script src='/js/all.min.js'></script>
     {% else %}
@@ -26,6 +28,7 @@
       <script src='/javascripts/vendor/d3.min.js'></script>
       <script src='/javascripts/vendor/moment.min.js'></script>
       <script src='/javascripts/client.js'></script>
+      <script src='/javascripts/sox.js'></script>
     {% endif %}
 
     </body>

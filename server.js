@@ -1,3 +1,6 @@
+
+//// DEFINE EXPRESS REQUEST HANDLING
+
 var express = require('express');
 var path = require('path');
 var favicon = require('static-favicon');
@@ -33,14 +36,14 @@ app.use('/', routes);
 app.use('/users', users);
 app.use('/api/', api);
 
-/// catch 404 and forward to error handler
+// catch 404 and forward to error handler
 app.use(function(req, res, next) {
     var err = new Error('Not Found');
     err.status = 404;
     next(err);
 });
 
-/// error handlers
+// error handlers
 
 // development error handler
 // will print stacktrace
@@ -66,7 +69,7 @@ app.use(function(err, req, res, next) {
     });
 });
 
-///// SET UP SERVER TO HANDLE SOCKETS
+//// INIT EXPRESS SERVER
 
 var debug = require('debug')('readtheremind');
 
@@ -84,39 +87,10 @@ if (process.env.NODE_ENV === 'production') {
   console.log('environment', 'development');
 }
 
-// socket io
+//// INIT SOCKET.IO
 var io = require('socket.io').listen(server);
-
-var usernames = {};
-var clients = {};
-var clientNumber = 0;
-
-// io.on('connection', function (socket) {
-//   var success = false;
-//   console.log('user attempting to connect...');
-
-//   socket.on('addUser', function(username){
-//     socket.username = username;
-//     socket.usernameID = username + clientNumber.toString()
-//     clientNumber += 1;
-//     clients[ socket.usernameID ] = socket;
-//     usernames[ socket.usernameID ] = username;
-//     success = true;
-
-//     console.log(username + " has successfully connected.");
-//     console.log("online users", usernames);
-
-//     socket.emit('login', {
-//       usernames: usernames,
-//       username: username
-//     });
-    
-//     socket.broadcast.emit('userJoined', {
-//       username: socket.username
-//     });
-    
-//   });
-// });
+var sox = require('./server-sockets');
+sox(io);
 
 
 module.exports = app;
