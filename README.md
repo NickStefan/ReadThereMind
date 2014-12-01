@@ -1,6 +1,7 @@
 # ReadThereMind
 
 Visualizes twitter sentiment over space and time on an animated map.
+http://readtheremind.herokuapp.com/
 
 ### Back End
 * Node.js/Express
